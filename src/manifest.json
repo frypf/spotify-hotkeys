@@ -68,8 +68,12 @@
             "description": "__MSG_volume_mute__",
             "global": true
         },
-        "queue-search": {
-            "description": "__MSG_queue_search__",
+        "search": {
+            "description": "__MSG_search__",
+            "global": true
+        },
+        "npv-queue": {
+            "description": "__MSG_npv_queue__",
             "global": true
         }
     },

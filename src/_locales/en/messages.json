@@ -7,8 +7,11 @@
         "message": "Add keyboard shortcuts to control playback in Spotify Web.",
         "description": "App description"
     },
-    "queue_search": {
-        "message": "Navigation: Home / Queue / Search"
+    "search": {
+        "message": "Navigation: Search"
+    },
+    "npv_queue": {
+        "message": "Navigation: Now playing view / Queue"
     },
     "short_play_pause": {
         "message": "Playback: play / pause"

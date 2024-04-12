@@ -1,8 +1,8 @@
-async function sendCommandToTab(command, tab) {
+async function sendCommandToTab(command, tab, tabWasActive) {
   // Let's have multiple methods to find the right button, because Spotify
   // decided front-end development was more exciting with randomized CSS
   // classes... but not for all UI elements of course. Yay, consistency!
-  async function findAndClick(command) {
+  async function findAndClick(command, tabWasActive) {
     // https://github.com/mantou132/Spotify-Lyrics/issues/94
     const DENY = '.extension-lyrics-button';
     const VALUE_SET = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
@@ -53,6 +53,7 @@ async function sendCommandToTab(command, tab) {
         'queue': [testid('control-button-queue')],
         'home': ['[href="/"]'],
         'search': ['[href="/search"]'],
+        'npv': [testid('control-button-npv')],
       }[command];
       if (!selectors) throw '';
       const selector = selectors.map(s => `${s}:not(${DENY})`).join(', ');
@@ -134,6 +135,10 @@ async function sendCommandToTab(command, tab) {
           'M10.533 1.279c-5.18 0-9.407 4.14-9.407 9.279s4.226 9.279 9.407 9.279c2.234 0 4.29-.77 5.907-2.058l4.353 4.353a1 1 0 1 0 1.414-1.414l-4.344-4.344a9.157 9.157 0 0 0 2.077-5.816c0-5.14-4.226-9.28-9.407-9.28zm-7.407 9.279c0-4.006 3.302-7.28 7.407-7.28s7.407 3.274 7.407 7.28-3.302 7.279-7.407 7.279-7.407-3.273-7.407-7.28z',
           'M1.126 10.558c0-5.14 4.226-9.28 9.407-9.28 5.18 0 9.407 4.14 9.407 9.28a9.157 9.157 0 0 1-2.077 5.816l4.344 4.344a1 1 0 0 1-1.414 1.414l-4.353-4.353a9.454 9.454 0 0 1-5.907 2.058c-5.18 0-9.407-4.14-9.407-9.28zm9.407-7.28c-4.105 0-7.407 3.274-7.407 7.28s3.302 7.279 7.407 7.279 7.407-3.273 7.407-7.28c0-4.005-3.302-7.278-7.407-7.278z'
         ],
+        'npv': [
+          'M15.002 1.75A1.75 1.75 0 0 0 13.252 0h-10.5a1.75 1.75 0 0 0-1.75 1.75v12.5c0 .966.783 1.75 1.75 1.75h10.5a1.75 1.75 0 0 0 1.75-1.75V1.75zm-1.75-.25a.25.25 0 0 1 .25.25v12.5a.25.25 0 0 1-.25.25h-10.5a.25.25 0 0 1-.25-.25V1.75a.25.25 0 0 1 .25-.25h10.5z',
+          'M11.196 8 6 5v6l5.196-3z'
+        ],
       }[command];
       if (!paths) throw '';
       const tag = (['search', 'home'].includes(command)) ? 'a' : 'button';
@@ -143,6 +148,10 @@ async function sendCommandToTab(command, tab) {
       if (!e) throw '<path> not found';
       while (!!e && !!e.tagName && e.tagName.toLowerCase() !== tag) e = e.parentNode;
       return (click) ? clickAndAnimate(e) : e;
+    }
+
+    function getUiElement(command) {
+      return usingSelector(command, false) ?? usingSvg(command, false);
     }
 
     function dispatchCommand(command) {
@@ -179,14 +188,18 @@ async function sendCommandToTab(command, tab) {
       }
     }
 
-    if (command === 'queue-search') {
-      if ((usingSelector('queue', false) ?? usingSvg('queue', false))?.dataset.active === `true`) {
-        dispatchCommand('queue');
-        command = 'search';
-      } else if (window.location.pathname.startsWith('/search')) {
-        command = 'home';
+    if (command === 'search') {
+      if (window.location.pathname.startsWith('/search') && tabWasActive) return history.back();
+    } else if (command === 'npv-queue') {
+      if (!tabWasActive) {
+        if (getUiElement('npv')?.dataset.active === `true`) return;
+        command = 'npv';
       } else {
-        command = 'queue';
+        if (getUiElement('npv')?.dataset.active === `true`) {
+          command = 'queue';
+        } else {
+          command = (getUiElement('queue')?.dataset.active === `true`) ? 'queue' : 'npv';
+        }
       }
     }
 
@@ -201,11 +214,11 @@ async function sendCommandToTab(command, tab) {
   return await chrome.scripting.executeScript({
     target: { tabId: tab.id },
     func: findAndClick,
-    args: [command],
+    args: [command, tabWasActive],
   });
 }
 
-async function getSpotifyTab(createIfNotExist = false, focusAndActivate = false) {
+async function getSpotifyTab(createIfNotExist = false, focusAndActivate = false, url = 'https://open.spotify.com/') {
   // First check current visible tab - extra processing but makes sure commands
   // executed / animations occur only within active tab & avoids jarring switch
   // to other tab / window if executing 'queue-search'.
@@ -216,7 +229,8 @@ async function getSpotifyTab(createIfNotExist = false, focusAndActivate = false)
     // Only create new spotify tab within most recent non-incognito window.
     let lastNormalWinId = state.winIdStack[0];
     lastNormalWinId ??= (await chrome.windows.create({ focused: false, incognito: false })).id;
-    spotifyTab = await chrome.tabs.create({ url: 'https://open.spotify.com', active: false, windowId: lastNormalWinId });
+    spotifyTab = await chrome.tabs.create({ url: url, active: false, windowId: lastNormalWinId });
+    wasCreated = true;
   }
   // Use expando prop on found tab to record combined tab.active & window.focus
   // states (before explicitly focusing if required below).
@@ -231,10 +245,10 @@ async function getSpotifyTab(createIfNotExist = false, focusAndActivate = false)
 }
 
 chrome.commands.onCommand.addListener(async function (command) {
-  const shouldCreateAndFocus = (command === 'queue-search');
-  const tab = await getSpotifyTab(shouldCreateAndFocus, shouldCreateAndFocus);
-  if (!tab || (command === 'queue-search' && !tab.focusedAndActive)) return;
-  const response = await sendCommandToTab(command, tab);
+  const shouldCreateAndFocus = (['search', 'npv-queue'].includes(command));
+  const tab = await getSpotifyTab(shouldCreateAndFocus, shouldCreateAndFocus, (command === 'search') ? 'https://open.spotify.com/search' : undefined);
+  if (!tab || (command === 'search' && tab.wasCreated)) return;
+  const response = await sendCommandToTab(command, tab, tab.focusedAndActive);
   if (response?.[0]?.result === 'requestUserInteraction') await getSpotifyTab(false, true);
 });
 
