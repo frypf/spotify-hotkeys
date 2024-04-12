@@ -39,7 +39,7 @@ async function sendCommandToTab(command, tab) {
       usingSlider('[class=playback-bar] input[type=range]', command == 'seek-forward');
     }
 
-    function usingSelector(command) {
+    function usingSelector(command, click = true) {
       const spoticon = x => `.control-button.spoticon-${x}-16`;
       const testid = x => `[data-testid=${x}]`;
       const selectors = {
@@ -56,12 +56,12 @@ async function sendCommandToTab(command, tab) {
       }[command];
       if (!selectors) throw '';
       const selector = selectors.map(s => `${s}:not(${DENY})`).join(', ');
-      clickAndAnimate(document.querySelector(selector));
+      return (click) ? clickAndAnimate(document.querySelector(selector)) : document.querySelector(selector);
     }
 
     // A Very Cursed search for a specific iconography using CSS <path> d=
     // attribute. Then go up the DOM tree to find the parent button and click.
-    function usingSvg(command) {
+    function usingSvg(command, click = true) {
       const paths = {
         'play-pause': [
           'M0 0h16v16H0z',
@@ -142,7 +142,7 @@ async function sendCommandToTab(command, tab) {
       let e = document.querySelector(selector);
       if (!e) throw '<path> not found';
       while (!!e && !!e.tagName && e.tagName.toLowerCase() !== tag) e = e.parentNode;
-      clickAndAnimate(e);
+      return (click) ? clickAndAnimate(e) : e;
     }
 
     function dispatchCommand(command) {
@@ -180,7 +180,8 @@ async function sendCommandToTab(command, tab) {
     }
 
     if (command === 'queue-search') {
-      if (window.location.pathname === '/queue') {
+      if ((usingSelector('queue', false) ?? usingSvg('queue', false))?.dataset.active === `true`) {
+        dispatchCommand('queue');
         command = 'search';
       } else if (window.location.pathname.startsWith('/search')) {
         command = 'home';
