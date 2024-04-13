@@ -236,10 +236,11 @@ async function getSpotifyTab(createIfNotExist = false, focusAndActivate = false,
 }
 
 chrome.commands.onCommand.addListener(async function (command) {
-  const shouldCreateAndFocus = (['search', 'npv', 'queue'].includes(command));
-  const tab = await getSpotifyTab(shouldCreateAndFocus, shouldCreateAndFocus, (command === 'search') ? 'https://open.spotify.com/search' : undefined);
-  if (!tab || (command === 'search' && tab.wasCreated)) return;
-  const response = await sendCommandToTab(command, tab, tab.focusedAndActive);
+  const commandName = command.replace(/\d+-/, '');
+  const shouldCreateAndFocus = (['search', 'npv', 'queue'].includes(commandName));
+  const tab = await getSpotifyTab(shouldCreateAndFocus, shouldCreateAndFocus, (commandName === 'search') ? 'https://open.spotify.com/search' : undefined);
+  if (!tab || (commandName === 'search' && tab.wasCreated)) return;
+  const response = await sendCommandToTab(commandName, tab, tab.focusedAndActive);
   if (response?.[0]?.result === 'requestUserInteraction') await getSpotifyTab(false, true);
 });
 

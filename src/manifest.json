@@ -15,69 +15,69 @@
     },
     "action": { },
     "commands": {
-        "play-pause": {
+        "001-npv": {
+            "description": "__MSG_npv__",
+            "global": true
+        },
+        "002-queue": {
+            "description": "__MSG_queue__",
+            "global": true
+        },
+        "003-search": {
+            "description": "__MSG_search__",
+            "global": true
+        },
+        "101-play-pause": {
             "description": "__MSG_short_play_pause__",
             "suggested_key": {
                 "default": "MediaPlayPause"
             },
             "global": true
         },
-        "previous": {
-            "description": "__MSG_short_previous__",
-            "suggested_key": {
-                "default": "MediaPrevTrack"
-            },
-            "global": true
-        },
-        "next": {
+        "102-next": {
             "description": "__MSG_short_next__",
             "suggested_key": {
                 "default": "MediaNextTrack"
             },
             "global": true
         },
-        "shuffle": {
-            "description": "__MSG_short_shuffle__",
+        "103-previous": {
+            "description": "__MSG_short_previous__",
+            "suggested_key": {
+                "default": "MediaPrevTrack"
+            },
             "global": true
         },
-        "repeat": {
-            "description": "__MSG_short_repeat__",
-            "global": true
-        },
-        "like": {
-            "description": "__MSG_short_like__",
-            "global": true
-        },
-        "seek-forward": {
+        "201-seek-forward": {
             "description": "__MSG_short_seek_forward__",
             "global": true
         },
-        "seek-backward": {
+        "202-seek-backward": {
             "description": "__MSG_short_seek_backward__",
             "global": true
         },
-        "volume-up": {
+        "301-shuffle": {
+            "description": "__MSG_short_shuffle__",
+            "global": true
+        },
+        "302-repeat": {
+            "description": "__MSG_short_repeat__",
+            "global": true
+        },
+        "303-like": {
+            "description": "__MSG_short_like__",
+            "global": true
+        },
+        "401-volume-up": {
             "description": "__MSG_volume_up__",
             "global": true
         },
-        "volume-down": {
+        "402-volume-down": {
             "description": "__MSG_volume_down__",
             "global": true
         },
-        "volume-mute": {
+        "403-volume-mute": {
             "description": "__MSG_volume_mute__",
-            "global": true
-        },
-        "search": {
-            "description": "__MSG_search__",
-            "global": true
-        },
-        "npv": {
-            "description": "__MSG_npv__",
-            "global": true
-        },
-        "queue": {
-            "description": "__MSG_queue__",
             "global": true
         }
     },
