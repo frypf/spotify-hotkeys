@@ -72,8 +72,12 @@
             "description": "__MSG_search__",
             "global": true
         },
-        "npv-queue": {
-            "description": "__MSG_npv_queue__",
+        "npv": {
+            "description": "__MSG_npv__",
+            "global": true
+        },
+        "queue": {
+            "description": "__MSG_queue__",
             "global": true
         }
     },

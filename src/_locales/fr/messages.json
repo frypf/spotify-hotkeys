@@ -8,8 +8,11 @@
     "search": {
         "message": "Navigation : Rechercher"
     },
-    "npv_queue": {
+    "npv": {
         "message": "Navigation : PENDING TRANSLATION"
+    },
+    "queue": {
+        "message": "Navigation : Liste de lecture"
     },
     "short_play_pause": {
         "message": "Lecture : lecture / pause"

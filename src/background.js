@@ -188,19 +188,10 @@ async function sendCommandToTab(command, tab, tabWasActive) {
       }
     }
 
-    if (command === 'search') {
-      if (window.location.pathname.startsWith('/search') && tabWasActive) return history.back();
-    } else if (command === 'npv-queue') {
-      if (!tabWasActive) {
-        if (getUiElement('npv')?.dataset.active === `true`) return;
-        command = 'npv';
-      } else {
-        if (getUiElement('npv')?.dataset.active === `true`) {
-          command = 'queue';
-        } else {
-          command = (getUiElement('queue')?.dataset.active === `true`) ? 'queue' : 'npv';
-        }
-      }
+    if (command === 'search' && tabWasActive && window.location.pathname.startsWith('/search')) {
+      return history.back();
+    } else if (['npv', 'queue'].includes(command) && !tabWasActive && getUiElement(command)?.dataset.active === `true`) {
+      return;
     }
 
     const result = (await import(chrome.runtime.getURL("web_accessible/checkPageInteraction.js"))).default(command, dispatchCommand);
@@ -245,7 +236,7 @@ async function getSpotifyTab(createIfNotExist = false, focusAndActivate = false,
 }
 
 chrome.commands.onCommand.addListener(async function (command) {
-  const shouldCreateAndFocus = (['search', 'npv-queue'].includes(command));
+  const shouldCreateAndFocus = (['search', 'npv', 'queue'].includes(command));
   const tab = await getSpotifyTab(shouldCreateAndFocus, shouldCreateAndFocus, (command === 'search') ? 'https://open.spotify.com/search' : undefined);
   if (!tab || (command === 'search' && tab.wasCreated)) return;
   const response = await sendCommandToTab(command, tab, tab.focusedAndActive);

@@ -10,8 +10,11 @@
     "search": {
         "message": "Navigation: Search"
     },
-    "npv_queue": {
-        "message": "Navigation: Now playing view / Queue"
+    "npv": {
+        "message": "Navigation: Now playing view"
+    },
+    "queue": {
+        "message": "Navigation: Queue"
     },
     "short_play_pause": {
         "message": "Playback: play / pause"
