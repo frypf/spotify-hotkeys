@@ -48,6 +48,7 @@ async function sendCommandToTab(command, tab, tabWasActive) {
         'previous': [spoticon('skip-back'), testid('control-button-skip-back')],
         'shuffle': [spoticon('shuffle'), testid('control-button-shuffle')],
         'repeat': [spoticon('repeat'), spoticon('repeatonce'), testid('control-button-repeat')],
+        'unlike': ['#context-menu button:has([aria-labelledby="listrow-title-spotify:collection:tracks"])'],
         'like': ['.control-button-heart', testid('add-button')],
         'volume-mute': ['.volume-bar__icon-button control-button', testid('volume-bar-toggle-mute-button')],
         'queue': [testid('control-button-queue')],
@@ -56,7 +57,8 @@ async function sendCommandToTab(command, tab, tabWasActive) {
         'npv': [testid('control-button-npv')],
       }[command];
       if (!selectors) throw '';
-      const selector = ((command === 'search') ? selectors.map(s => `${s}:not(${DENY})`) : selectors.map(s => `footer ${s}:not(${DENY})`)).join(', ');
+      const withinFooter = (!['search', 'unlike'].includes(command)) ? 'footer ' : '';
+      const selector = selectors.map(s => `${withinFooter}${s}:not(${DENY})`).join(', ');
       return (click) ? clickAndAnimate(document.querySelector(selector)) : document.querySelector(selector);
     }
 
@@ -88,10 +90,12 @@ async function sendCommandToTab(command, tab, tabWasActive) {
           'M13.151.922a.75.75 0 1 0-1.06 1.06L13.109 3H11.16a3.75 3.75 0 0 0-2.873 1.34l-6.173 7.356A2.25 2.25 0 0 1 .39 12.5H0V14h.391a3.75 3.75 0 0 0 2.873-1.34l6.173-7.356a2.25 2.25 0 0 1 1.724-.804h1.947l-1.017 1.018a.75.75 0 0 0 1.06 1.06L15.98 3.75 13.15.922zM.391 3.5H0V2h.391c1.109 0 2.16.49 2.873 1.34L4.89 5.277l-.979 1.167-1.796-2.14A2.25 2.25 0 0 0 .39 3.5z',
           'm7.5 10.723.98-1.167.957 1.14a2.25 2.25 0 0 0 1.724.804h1.947l-1.017-1.018a.75.75 0 1 1 1.06-1.06l2.829 2.828-2.829 2.828a.75.75 0 1 1-1.06-1.06L13.109 13H11.16a3.75 3.75 0 0 1-2.873-1.34l-.787-.938z',
         ],
+        'unlike': [
+          'M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm11.748-1.97a.75.75 0 0 0-1.06-1.06l-4.47 4.47-1.405-1.406a.75.75 0 1 0-1.061 1.06l2.466 2.467 5.53-5.53z',
+        ],
         'like': [
           'M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8z',
           'M11.75 8a.75.75 0 0 1-.75.75H8.75V11a.75.75 0 0 1-1.5 0V8.75H5a.75.75 0 0 1 0-1.5h2.25V5a.75.75 0 0 1 1.5 0v2.25H11a.75.75 0 0 1 .75.75z',
-          'M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm11.748-1.97a.75.75 0 0 0-1.06-1.06l-4.47 4.47-1.405-1.406a.75.75 0 1 0-1.061 1.06l2.466 2.467 5.53-5.53z',
           'M13.764 2.727a4.057 4.057 0 00-5.488-.253.558.558 0 01-.31.112.531.531 0 01-.311-.112 4.054 4.054 0 00-5.487.253A4.05 4.05 0 00.974 5.61c0 1.089.424 2.113 1.168 2.855l4.462 5.223a1.791 1.791 0 002.726 0l4.435-5.195A4.052 4.052 0 0014.96 5.61a4.057 4.057 0 00-1.196-2.883zm-.722 5.098L8.58 13.048c-.307.36-.921.36-1.228 0L2.864 7.797a3.072 3.072 0 01-.905-2.187c0-.826.321-1.603.905-2.187a3.091 3.091 0 012.191-.913 3.05 3.05 0 011.957.709c.041.036.408.351.954.351.531 0 .906-.31.94-.34a3.075 3.075 0 014.161.192 3.1 3.1 0 01-.025 4.403z',
           'M1.69 2A4.582 4.582 0 018 2.023 4.583 4.583 0 0111.88.817h.002a4.618 4.618 0 013.782 3.65v.003a4.543 4.543 0 01-1.011 3.84L9.35 14.629a1.765 1.765 0 01-2.093.464 1.762 1.762 0 01-.605-.463L1.348 8.309A4.582 4.582 0 011.689 2zm3.158.252A3.082 3.082 0 002.49 7.337l.005.005L7.8 13.664a.264.264 0 00.311.069.262.262 0 00.09-.069l5.312-6.33a3.043 3.043 0 00.68-2.573 3.118 3.118 0 00-2.551-2.463 3.079 3.079 0 00-2.612.816l-.007.007a1.501 1.501 0 01-2.045 0l-.009-.008a3.082 3.082 0 00-2.121-.861z',
           'M15.724 4.22A4.313 4.313 0 0012.192.814a4.269 4.269 0 00-3.622 1.13.837.837 0 01-1.14 0 4.272 4.272 0 00-6.21 5.855l5.916 7.05a1.128 1.128 0 001.727 0l5.916-7.05a4.228 4.228 0 00.945-3.577z',
@@ -145,7 +149,8 @@ async function sendCommandToTab(command, tab, tabWasActive) {
       }[command];
       if (!paths) throw '';
       const tag = (['search', 'home'].includes(command)) ? 'a' : 'button';
-      const selector = ((command === 'search') ? paths.map(p => `${tag} svg path[d="${p}"]`) : paths.map(p => `footer ${tag} svg path[d="${p}"]`)).join(', ');
+      const withinFooter = (!['search', 'unlike'].includes(command)) ? 'footer ' : '';
+      const selector = paths.map(p => `${withinFooter}${tag} svg path[d="${p}"]`).join(', ');
       if (!selector) throw '';
       let e = document.querySelector(selector);
       if (!e) throw '<path> not found';
@@ -154,7 +159,14 @@ async function sendCommandToTab(command, tab, tabWasActive) {
     }
 
     function getUiElement(command) {
-      return usingSelector(command, false) ?? usingSvg(command, false);
+      try {
+        return usingSelector(command, false) ?? usingSvg(command, false);
+      } catch (_) {
+        try {
+          return usingSvg(command, false);
+        } catch (_) { }
+        return null;
+      }
     }
 
     function dispatchCommand(command) {
@@ -165,6 +177,46 @@ async function sendCommandToTab(command, tab, tabWasActive) {
           console.warn(`[Spotify Web Player Hotkeys] Could not change volume slider: ${e}`);
         }
         return;
+      }
+
+      if (command === 'unlike') {
+        if (!tabWasActive) return console.warn(`[Spotify Web Player Hotkeys] Cannot 'unlike' song unless tab is active`);
+        let observerTarget = document.body;
+        let contextMenu = document.querySelector('#context-menu:has([aria-labelledby="listrow-title-spotify:collection:tracks"])');
+        let unlikeBtn = usingSelector('unlike', false)
+        const removeObserver = () => {
+          unlikeObserver.disconnect();
+          unlikeObserver = null;
+          console.warn('observer removed');
+        }
+        let unlikeObserver = new MutationObserver(mutations => {
+          for (const mutation of mutations) {
+            if (observerTarget !== document.body && [...mutation.removedNodes].some(n => n.id === 'context-menu' || n.querySelector('#context-menu'))) return removeObserver();
+            [...mutation.addedNodes].some(n => {
+              if (!contextMenu) {
+                if (!!(contextMenu = n.querySelector('#context-menu'))) {
+                  observerTarget = n;
+                  unlikeObserver.disconnect();
+                  unlikeObserver.observe(observerTarget, { childList: true, subtree: true });
+                  console.warn('observing context menu:', observerTarget, `waiting for 'Liked Songs' button`);
+                  return true;
+                }
+              } else if (contextMenu && !unlikeBtn) {
+                if (!!(unlikeBtn = n.querySelector('button:has([aria-labelledby="listrow-title-spotify:collection:tracks"])'))) {
+                  if (unlikeBtn.ariaChecked === 'true') unlikeBtn.click();
+                  console.warn(`'Liked Songs' clicked:`, observerTarget, `waiting for 'Done' button`);
+                  return true;
+                }
+              } else if (n && n?.tagName.toLowerCase() === 'button' && n?.getAttribute('type') === 'submit') {
+                n.click();
+                console.warn(`'Done' clicked:`, observerTarget);
+                removeObserver();
+                return true;
+              }
+            });
+          }
+        });
+        unlikeObserver.observe(observerTarget, { childList: true, subtree: true });
       }
 
       try {
@@ -193,6 +245,8 @@ async function sendCommandToTab(command, tab, tabWasActive) {
 
     if (command === 'search' && tabWasActive && window.location.pathname.startsWith('/search')) {
       return history.back();
+    } else if (command === 'like' && getUiElement('unlike')) {
+      command = 'unlike'
     } else if (['npv', 'queue'].includes(command) && !tabWasActive && getUiElement(command)?.dataset.active === `true`) {
       return;
     }
